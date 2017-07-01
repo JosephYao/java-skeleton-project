@@ -32,6 +32,7 @@ public class ConfigurableDriver implements Driver {
     @Override
     public void navigateTo(String url) {
         webDriver.get(urlWithHostAndPort(url));
+        webDriver.switchTo().window(webDriver.getWindowHandle());
     }
 
     @Override
