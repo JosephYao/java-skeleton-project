@@ -1,4 +1,4 @@
-This is the repo for Hangman GOOS demo series.
+This is the repo can be used as a skeleton for any Java project. It has simple code, unit test and acceptance test enabled for Hello world.
 
 # Installation
 Please install the following tools for this project. The latest version should be fine unless specific version is listed.
