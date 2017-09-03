@@ -1,9 +1,6 @@
 package com.odde.hangman.driver;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -23,6 +20,10 @@ public class ConfigurableDriver implements Driver {
     private static final String HOST_NAME = "http://localhost";
     private static final int DEFAULT_TIME_OUT_IN_SECONDS = 10;
     private final WebDriver webDriver = new ChromeDriver();
+    @Value("${cucumber.port}")
+    private String port;
+    @Value("${cucumber.context-path}")
+    private String contextPath;
 
     @Override
     public void close() {
@@ -37,8 +38,16 @@ public class ConfigurableDriver implements Driver {
 
     @Override
     public void waitForTextPresent(String text) {
-        new WebDriverWait(webDriver, DEFAULT_TIME_OUT_IN_SECONDS).until(
-                (ExpectedCondition<Boolean>) webDriver -> getAllTextInPage().contains(text));
+        try {
+            new WebDriverWait(webDriver, DEFAULT_TIME_OUT_IN_SECONDS).until(
+                    (ExpectedCondition<Boolean>) webDriver -> getAllTextInPage().contains(text));
+        } catch (TimeoutException e) {
+            throw new TimeoutException(textNotFoundMessage(text));
+        }
+    }
+
+    private String textNotFoundMessage(String text) {
+        return String.format("Timed out after %d seconds waiting for \"%s\"", DEFAULT_TIME_OUT_IN_SECONDS, text);
     }
 
     @Override
@@ -86,11 +95,6 @@ public class ConfigurableDriver implements Driver {
     private WebElement elementByTag() {
         return webDriver.findElement(By.tagName("body"));
     }
-
-    @Value("${cucumber.port}")
-    private String port;
-    @Value("${cucumber.context-path}")
-    private String contextPath;
 
     private String urlWithHostAndPort(String url) {
         return HOST_NAME + DELIMITER + port + contextPath + url;
